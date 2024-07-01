@@ -10,7 +10,12 @@
 
 int main(void)
 {
-    /* Replace with your application code */
+    DDRC |= 1<<PORTC3;
+	DDRB |= (1<<PORTB1 || 1<<PORTB2 || 1<<PORTB5);
+	PORTC |= 1<<PORTC3;
+	PORTB |= (1<<PORTB1 || 1<<PORTB2 || 1<<PORTB5);
+	
+	PORTB &= ~(1<<PORTB5);
     while (1) 
     {
     }
