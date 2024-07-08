@@ -6,18 +6,22 @@
  */ 
 
 #include <avr/io.h>
+#include "MEF.h"
+#include <util/delay.h>
 
 
 int main(void)
 {
-    DDRC |= 1<<PORTC3;
-	DDRB |= (1<<PORTB1 || 1<<PORTB2 || 1<<PORTB5);
-	PORTC |= 1<<PORTC3;
-	PORTB |= (1<<PORTB1 || 1<<PORTB2 || 1<<PORTB5);
+	DDRB |= (1<<PORTB1 | 1<<PORTB2 | 1<<PORTB5);
+
+	//PORTB &= ~(1<<PORTB1 | 1<<PORTB2 | 1<<PORTB5);
 	
-	PORTB &= ~(1<<PORTB5);
+	PORTB |= (1<<PORTB1 | 1<<PORTB2 | 1<<PORTB5);
+	//PORTB &= ~(1<<PORTB5);
     while (1) 
     {
+		MEF_update();
+		_delay_ms(100);
     }
 }
 
