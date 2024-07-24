@@ -14,8 +14,8 @@ void init_timer(void){
 	TCCR0B |= ((1<<CS00) | (1<<CS02)); //prescaler 1024
 }
 
-void PWM(Colores datos){
-	OCR0A = (intensidad + 1) * 100 / 256;
-}
-DDRD |= 
-OCR0A 
+//void PWM(Colores datos){
+	//OCR0A = (intensidad + 1) * 100 / 256;
+//}
+//DDRD |= 
+//OCR0A 

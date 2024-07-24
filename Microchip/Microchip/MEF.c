@@ -7,7 +7,8 @@
 #include "MEF.h"
 #include "serialPort.h"
 #include "timer.h"
-#include <avr/io.h>
+
+#include <stdio.h>
 
 typedef enum{R, G, B, IDLE} COLOR;
 	
@@ -62,11 +63,18 @@ void Init_consola(){
 
 		
 }
-
 uint8_t leerConsola(uint8_t letra){
 
 	SerialPort_Wait_Until_New_Data();	  // Pooling - Bloqueante, puede durar indefinidamente.
 	letra = SerialPort_Recive_Data();
+	
+	
+	char  msg1[50];
+	sprintf(msg1, "\r\nTecla presionada: &c\r\n",letra);
+	
+	SerialPort_Wait_For_TX_Buffer_Free(); // Espero a que el canal de transmisión este libre (bloqueante)
+	SerialPort_Send_String(msg1);
+	
 	
 	if(letra == 'R' || letra == 'G' || letra == 'B' || letra == 'r' || letra == 'g' || letra == 'b'){
 		if (letra == 'r' || letra == 'g' || letra == 'b')

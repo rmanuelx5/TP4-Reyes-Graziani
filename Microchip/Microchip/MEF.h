@@ -11,6 +11,8 @@
 #define BR9600 (0x67)	//para la consola
 #define F_CPU 16000000UL
 
+#include <avr/io.h>
+
 void MEF_update(void);
 
 
