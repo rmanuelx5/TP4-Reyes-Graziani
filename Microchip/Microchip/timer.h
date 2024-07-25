@@ -1,16 +1,18 @@
 /*
  * timer.h
  *
- * Created: 8/7/2024 14:45:45
- *  Author: Barcala
+ * Created: 5/5/2024 14:45:37
+ *  Author: manuc
  */ 
 
+#include <avr/io.h>
+#include <avr/interrupt.h>
+#define F_CPU 16000000UL
 
 #ifndef TIMER_H_
 #define TIMER_H_
 
-#include "MEF.h"
 
-
+void timerInit();
 
 #endif /* TIMER_H_ */

@@ -15,6 +15,8 @@
 
 void MEF_update(void);
 
+void inits(void);
 
+void PWM_soft_Update(void);
 
 #endif /* MEF_H_ */

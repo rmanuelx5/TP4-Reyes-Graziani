@@ -5,19 +5,16 @@
  * Author : Barcala
  */ 
 
-#include <avr/io.h>
 #include "MEF.h"
 #include <util/delay.h>
+#include "timer.h"
 
 
 int main(void)
 {
-	DDRB |= (1<<PORTB1 | 1<<PORTB2 | 1<<PORTB5);
-
-	//PORTB &= ~(1<<PORTB1 | 1<<PORTB2 | 1<<PORTB5);
+	inits();
+	timerInit();
 	
-	PORTB |= (1<<PORTB1 | 1<<PORTB2 | 1<<PORTB5);
-	//PORTB &= ~(1<<PORTB5);
     while (1) 
     {
 		MEF_update();
@@ -25,3 +22,6 @@ int main(void)
     }
 }
 
+ISR(TIMER0_COMPA_vect){
+	PWM_soft_Update();
+}
