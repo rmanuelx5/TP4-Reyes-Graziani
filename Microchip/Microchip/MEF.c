@@ -42,9 +42,9 @@ void init_puertos(){
 	DDRB |= (1<<PORTB1 | 1<<PORTB2 | 1<<PORTB5);
 }
 void initADC(){
-	DDRC &= ~( 1<<PORTC3);
+	DDRC &= ~(1<<PORTC3);
 	ADCSRA = 0x87;//make ADC enable and select ck/128
-	ADMUX = 0x03;//Ref external VCC, ADC3, right-justified
+	ADMUX = (1 << REFS0) | 0x03;//Ref external VCC, ADC3, right-justified
 }
 void Init_consola(){
 	SerialPort_Init(BR9600); 		// Inicializo formato 8N1 y BAUDRATE = 9600bps
@@ -58,23 +58,23 @@ void inits(){
 	Init_consola();
 }
 
-//uint8_t leerPot(){
-	//uint8_t val;
-	//ADCSRA |= (1<<ADSC);//start conversion
-	//while((ADCSRA&(1<<ADIF))==0); //wait for end of conversion
-		//ADCSRA |= (1<<ADIF); //clear the ADIF flag
-	//val = (ADCW*10)/93;// adc value/9.3
-	//return val;
-//}
-
 uint8_t leerPot(){
 	uint8_t val;
-	ADCSRA |= (1<<ADSC); // Iniciar conversión
-	while((ADCSRA & (1<<ADIF)) == 0); // Esperar a que termine la conversión
-	ADCSRA |= (1<<ADIF); // Limpiar la bandera ADIF
-	val = (ADCW * 255) / 1023; // Escalar el valor ADC al rango 0-255
+	ADCSRA |= (1<<ADSC);//start conversion
+	while((ADCSRA&(1<<ADIF))==0); //wait for end of conversion
+		ADCSRA |= (1<<ADIF); //clear the ADIF flag
+	val = (ADCW)/4;// adc value/9.3
 	return val;
 }
+
+//uint8_t leerPot(){
+	//uint8_t val;
+	//ADCSRA |= (1<<ADSC); // Iniciar conversión
+	//while((ADCSRA & (1<<ADIF)) == 0); // Esperar a que termine la conversión
+	//ADCSRA |= (1<<ADIF); // Limpiar la bandera ADIF
+	//val = (ADCW * 255) / 1023; // Escalar el valor ADC al rango 0-255
+	//return val;
+//}
 
 void actualizar(uint8_t Puerto){
 	valAct = leerPot();

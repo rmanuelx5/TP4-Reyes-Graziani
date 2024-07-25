@@ -12,8 +12,8 @@
 
 int main(void)
 {
-	inits();
-	timerInit();
+	inits(); //Inicia consola, puertos, y ADC
+	timerInit(); //Inicia interrupciones cada 1ms
 	
     while (1) 
     {
