@@ -7,12 +7,12 @@
 #include "MEF.h"
 #include "serialPort.h"
 
-#include <stdio.h>
+#include <string.h>
 
 #define PWM_PERIOD 256 // Periodo PWM de 8 bits
-#define PWM_START DDRB |= (1 << PORTB5) // Configurar PB5 como salida
-#define PWM_OFF PORTB &= ~(1 << PORTB5)
-#define PWM_ON PORTB |= (1 << PORTB5)
+#define PWM_START DDRB |= (1 << PORTD4) // Configurar PB5 como salida
+#define PWM_OFF PORTB &= ~(1 << PORTD4)
+#define PWM_ON PORTB |= (1 << PORTD4)
 
 static uint8_t pwm_r = 128; // Duty cycle inicial para rojo (PB5)
 
@@ -110,13 +110,13 @@ uint8_t leerConsola(uint8_t letra){
 		// Construir el mensaje dependiendo de la letra recibida
 		switch (letra) {
 			case 'R':
-			sprintf(msg1, "\r\nCambiando LED: Rojo (esperar 3 segundos para volver a elegir)\r\n");
+			strcpy(msg1, "\r\nCambiando LED: Rojo (esperar 3 segundos para volver a elegir)\r\n");
 			break;
 			case 'G':
-			sprintf(msg1, "\r\nCambiando LED: Verde (esperar 3 segundos para volver a elegir)\r\n");
+			strcpy(msg1, "\r\nCambiando LED: Verde (esperar 3 segundos para volver a elegir)\r\n");
 			break;
 			case 'B':
-			sprintf(msg1, "\r\nCambiando LED: Azul (esperar 3 segundos para volver a elegir)\r\n");
+			strcpy(msg1, "\r\nCambiando LED: Azul (esperar 3 segundos para volver a elegir)\r\n");
 			break;
 		}
 		

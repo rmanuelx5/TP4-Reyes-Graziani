@@ -25,8 +25,12 @@ void timer0Init(){
 }
 
 void timer1Init() {
-	// Configuración de Timer1 en modo Fast PWM, 8 bits
-	TCCR1A |= (1 << WGM10) | (1 << COM1A1) | (1 << COM1B1);
-	TCCR1B |= (1 << WGM12) | (1 << CS10); // No prescaler
-	DDRB |= (1 << PB1) | (1 << PB2); // PB1 y PB2 como salida
+	DDRB |= (1 << PB1) | (1 << PB2);
+	
+	// Configura el Timer 1 para el modo Fast PWM con el prescaler a 64
+	TCCR1A |= (1 << WGM11) | (1 << COM1A1) | (1 << COM1B1); // Fast PWM, no inverting mode
+	TCCR1B |= (1 << WGM12) | (1 << WGM13) | (1 << CS11) | (1 << CS10); // Prescaler = 64
+	
+	// Configura el top value para 8 bits (0xFF)
+	ICR1 = 0xFF;
 }
