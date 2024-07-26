@@ -10,9 +10,9 @@
 #include <string.h>
 
 #define PWM_PERIOD 256 // Periodo PWM de 8 bits
-#define PWM_START DDRB |= (1 << PORTD4) // Configurar PB5 como salida
-#define PWM_OFF PORTB &= ~(1 << PORTD4)
-#define PWM_ON PORTB |= (1 << PORTD4)
+#define PWM_START DDRB |= (1 << PORTB5) // Configurar PB5 como salida
+#define PWM_OFF PORTB &= ~(1 << PORTB5)
+#define PWM_ON PORTB |= (1 << PORTB5)
 
 static uint8_t pwm_r = 128; // Duty cycle inicial para rojo (PB5)
 
@@ -22,7 +22,6 @@ static uint8_t PWM_position=0;
 typedef enum{R, G, B, IDLE} COLOR;
 	
 static COLOR estado = IDLE;
-static uint8_t letra;
 
 static uint8_t salir, valAnt=0, valAct=0;
 
@@ -39,6 +38,8 @@ void PWM_soft_Update(){
 			
 void init_puertos(){	
 	DDRB |= (1<<PORTB1 | 1<<PORTB2 | 1<<PORTB5);
+	OCR1B = 128;
+	OCR1A = 128;
 }
 void initADC(){
 	DDRC &= ~(1<<PORTC3);
@@ -66,15 +67,15 @@ uint8_t leerPot(){
 	return val;
 }
 
-void actualizar(uint8_t Puerto){
+void actualizar(){
 	valAct = leerPot();
 	if (valAct != valAnt){
 		salir = 0;
 		valAnt = valAct;
 
-		if (Puerto == PORTB2) // Verde
+		if (estado == G) // Verde
 			OCR1B = valAct;
-		else if (Puerto == PORTB1) // Azul
+		else if (estado == B) // Azul
 			OCR1A = valAct;
 	}
 	
@@ -85,7 +86,7 @@ void actualizar(uint8_t Puerto){
 
 void actualizarSW(){
 	valAct = leerPot();
-	if (valAct != valAnt){
+	if (valAct != valAnt && estado == R){
 		salir = 0;
 		valAnt = valAct;
 		pwm_r = valAct;
@@ -96,10 +97,10 @@ void actualizarSW(){
 	estado = IDLE;
 }
 
-uint8_t leerConsola(uint8_t letra){
+uint8_t leerConsola(){
 
 	SerialPort_Wait_Until_New_Data();	  // Pooling - Bloqueante, puede durar indefinidamente.
-	letra = SerialPort_Recive_Data();	
+	uint8_t letra = SerialPort_Recive_Data();	
 	
 	if(letra == 'R' || letra == 'G' || letra == 'B' || letra == 'r' || letra == 'g' || letra == 'b'){
 		if (letra == 'r' || letra == 'g' || letra == 'b')
@@ -111,12 +112,15 @@ uint8_t leerConsola(uint8_t letra){
 		switch (letra) {
 			case 'R':
 			strcpy(msg1, "\r\nCambiando LED: Rojo (esperar 3 segundos para volver a elegir)\r\n");
+			estado = R;
 			break;
 			case 'G':
 			strcpy(msg1, "\r\nCambiando LED: Verde (esperar 3 segundos para volver a elegir)\r\n");
+			estado = G;
 			break;
 			case 'B':
 			strcpy(msg1, "\r\nCambiando LED: Azul (esperar 3 segundos para volver a elegir)\r\n");
+			estado = B;
 			break;
 		}
 		
@@ -134,14 +138,13 @@ void MEF_update(){
 			actualizarSW();
 			break;
 		case G:
-			actualizar(PORTB2);
+			actualizar();
 			break;
 		case B:
-			actualizar(PORTB1);
+			actualizar();
 			break;
 		case IDLE:
-			if(leerConsola(letra)){
-				estado=letra;
+			if(leerConsola()){
 				salir = 0;
 			}
 			break;
