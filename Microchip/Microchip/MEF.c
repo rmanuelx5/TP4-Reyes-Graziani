@@ -10,9 +10,9 @@
 #include <stdio.h>
 
 #define PWM_PERIOD 256 // Periodo PWM de 8 bits
-#define PWM_START DDRB |= (1 << PB5) // Configurar PB5 como salida
-#define PWM_OFF PORTB &= ~(1 << PB5)
-#define PWM_ON PORTB |= (1 << PB5)
+#define PWM_START DDRB |= (1 << PORTB5) // Configurar PB5 como salida
+#define PWM_OFF PORTB &= ~(1 << PORTB5)
+#define PWM_ON PORTB |= (1 << PORTB5)
 
 static uint8_t pwm_r = 128; // Duty cycle inicial para rojo (PB5)
 
@@ -72,9 +72,9 @@ void actualizar(uint8_t Puerto){
 		salir = 0;
 		valAnt = valAct;
 
-		if (puerto == PB2) // Verde
-			 estOCR1B = valAct;
-		else if (puerto == PB1) // Azul
+		if (Puerto == PORTB2) // Verde
+			OCR1B = valAct;
+		else if (Puerto == PORTB1) // Azul
 			OCR1A = valAct;
 	}
 	
@@ -92,7 +92,7 @@ void actualizarSW(){
 	}
 	
 	salir++;
-	if (salir >= 50) //Sale luego de 5 seg de inactividad (main tiene delay de 100ms)
+	if (salir >= 30) //Sale luego de 3 seg de inactividad (main tiene delay de 100ms)
 	estado = IDLE;
 }
 
@@ -105,8 +105,20 @@ uint8_t leerConsola(uint8_t letra){
 		if (letra == 'r' || letra == 'g' || letra == 'b')
 			letra-=32;		//se pasa a mayusculas segun tabla ascii		
 			
-		char  msg1[50];
-		sprintf(msg1, "\r\nTecla presionada: %c \r\n",letra);
+		char msg1[100]; // Aumenta el tamaño del buffer para el mensaje completo
+
+		// Construir el mensaje dependiendo de la letra recibida
+		switch (letra) {
+			case 'R':
+			sprintf(msg1, "\r\nCambiando LED: Rojo (esperar 3 segundos para volver a elegir)\r\n");
+			break;
+			case 'G':
+			sprintf(msg1, "\r\nCambiando LED: Verde (esperar 3 segundos para volver a elegir)\r\n");
+			break;
+			case 'B':
+			sprintf(msg1, "\r\nCambiando LED: Azul (esperar 3 segundos para volver a elegir)\r\n");
+			break;
+		}
 		
 		SerialPort_Wait_For_TX_Buffer_Free(); // Espero a que el canal de transmisión este libre (bloqueante)
 		SerialPort_Send_String(msg1);
