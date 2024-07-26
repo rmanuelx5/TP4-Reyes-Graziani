@@ -8,7 +8,7 @@
 #include "timer.h"
 
 
-void timerInit(){
+void timer0Init(){
 	
 	cli();
 	
@@ -22,4 +22,11 @@ void timerInit(){
 	sei();
 	
 	TCCR0B=0x04; //prescaler 256 0x04
+}
+
+void timer1Init() {
+	// Configuración de Timer1 en modo Fast PWM, 8 bits
+	TCCR1A |= (1 << WGM10) | (1 << COM1A1) | (1 << COM1B1);
+	TCCR1B |= (1 << WGM12) | (1 << CS10); // No prescaler
+	DDRB |= (1 << PB1) | (1 << PB2); // PB1 y PB2 como salida
 }

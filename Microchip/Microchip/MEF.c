@@ -27,7 +27,6 @@ static uint8_t letra;
 static uint8_t salir, valAnt=0, valAct=0;
 
 
-
 void PWM_soft_Update(){
 	if (++PWM_position>=PWM_PERIOD)
 		PWM_position=0;
@@ -60,36 +59,27 @@ void inits(){
 
 uint8_t leerPot(){
 	uint8_t val;
-	ADCSRA |= (1<<ADSC);//start conversion
-	while((ADCSRA&(1<<ADIF))==0); //wait for end of conversion
-		ADCSRA |= (1<<ADIF); //clear the ADIF flag
-	val = (ADCW)/4;// adc value/9.3
+	ADCSRA |= (1<<ADSC);// Iniciar conversión
+	while((ADCSRA&(1<<ADIF))==0); // Esperar a que termine la conversión
+	ADCSRA |= (1<<ADIF); // Limpiar la bandera ADIF
+	val = (ADCW)/4;// // Escalar el valor ADC (valor máximo 1024/4 = 256)
 	return val;
 }
-
-//uint8_t leerPot(){
-	//uint8_t val;
-	//ADCSRA |= (1<<ADSC); // Iniciar conversión
-	//while((ADCSRA & (1<<ADIF)) == 0); // Esperar a que termine la conversión
-	//ADCSRA |= (1<<ADIF); // Limpiar la bandera ADIF
-	//val = (ADCW * 255) / 1023; // Escalar el valor ADC al rango 0-255
-	//return val;
-//}
 
 void actualizar(uint8_t Puerto){
 	valAct = leerPot();
 	if (valAct != valAnt){
 		salir = 0;
 		valAnt = valAct;
-		if(Puerto == PORTB2) //Verde
-			OCR1B = valAct;
-		else
-			if (Puerto == PORTB1) //Azul
-				OCR1A = valAct;
+
+		if (puerto == PB2) // Verde
+			 estOCR1B = valAct;
+		else if (puerto == PB1) // Azul
+			OCR1A = valAct;
 	}
 	
 	salir++;
-	if (salir >= 50) //Sale luego de 5 seg de inactividad (main tiene delay de 100ms)
+	if (salir >= 30) //Sale luego de 3 seg de inactividad (main tiene delay de 100ms)
 		estado = IDLE;
 }
 

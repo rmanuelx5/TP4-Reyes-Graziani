@@ -13,6 +13,7 @@
 #define TIMER_H_
 
 
-void timerInit();
+void timer0Init();
+void timer1Init();
 
 #endif /* TIMER_H_ */

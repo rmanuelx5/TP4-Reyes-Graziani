@@ -13,7 +13,8 @@
 int main(void)
 {
 	inits(); //Inicia consola, puertos, y ADC
-	timerInit(); //Inicia interrupciones cada 1ms
+	timer0Init(); //Inicia interrupciones cada 1ms para el PWM por SW (Luz roja)
+	timer1Init(); //PWM para luces verde y azul
 	
     while (1) 
     {
