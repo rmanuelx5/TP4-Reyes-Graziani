@@ -14,8 +14,9 @@ void timer0Init(){
 	
 	TCCR0B=0x00; //Timer apagado
 	TCCR0A=0x02; //Modo ctc02
-	OCR0A=0x3E;	 //Activo comparacion en A con 62
+	OCR0A=0x04;	 //Activo comparacion en A con 04  Comparador hasta 4 para un frecuencia de led roja de aprox 61Hz
 	TCNT0=0x00;	 //Reinicio contador para borrar basura
+	
 	
 	TIMSK0=(1<<OCIE0A);
 	

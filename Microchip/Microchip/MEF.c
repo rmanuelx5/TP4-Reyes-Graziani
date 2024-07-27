@@ -8,6 +8,7 @@
 #include "serialPort.h"
 
 #include <string.h>
+#include <stdio.h>
 
 #define PWM_PERIOD 256 // Periodo PWM de 8 bits
 #define PWM_START DDRB |= (1 << PORTB5) // Configurar PB5 como salida
@@ -30,7 +31,7 @@ void PWM_soft_Update(){
 	if (++PWM_position>=PWM_PERIOD)
 		PWM_position=0;
 
-	if (PWM_position<pwm_r)
+	if (PWM_position<=pwm_r)
 		PWM_ON;
 	else
 		PWM_OFF;
@@ -44,7 +45,7 @@ void init_puertos(){
 void initADC(){
 	DDRC &= ~(1<<PORTC3);
 	ADCSRA = 0x87;//make ADC enable and select ck/128
-	ADMUX = (1 << REFS0) | 0x03;//Ref external VCC, ADC3, right-justified
+	ADMUX = (0 << REFS1) | (1 << REFS0) | (1 << ADLAR) | 0x03;//Ref external VCC, ADC3, right-justified
 }
 void Init_consola(){
 	SerialPort_Init(BR9600); 		// Inicializo formato 8N1 y BAUDRATE = 9600bps
@@ -59,12 +60,13 @@ void inits(){
 }
 
 uint8_t leerPot(){
-	uint8_t val;
+	//uint8_t val;
 	ADCSRA |= (1<<ADSC);// Iniciar conversión
 	while((ADCSRA&(1<<ADIF))==0); // Esperar a que termine la conversión
 	ADCSRA |= (1<<ADIF); // Limpiar la bandera ADIF
-	val = (ADCW)/4;// // Escalar el valor ADC (valor máximo 1024/4 = 256)
-	return val;
+	//val = ADCH;// // Escalar el valor ADC (valor máximo 1024/4 = 256)
+
+	return ADCH;
 }
 
 void actualizar(){
@@ -82,6 +84,7 @@ void actualizar(){
 	salir++;
 	if (salir >= 30) //Sale luego de 3 seg de inactividad (main tiene delay de 100ms)
 		estado = IDLE;
+	return;
 }
 
 void actualizarSW(){
@@ -94,7 +97,8 @@ void actualizarSW(){
 	
 	salir++;
 	if (salir >= 30) //Sale luego de 3 seg de inactividad (main tiene delay de 100ms)
-	estado = IDLE;
+		estado = IDLE;
+	return;
 }
 
 uint8_t leerConsola(){
@@ -133,6 +137,7 @@ uint8_t leerConsola(){
 }
 
 void MEF_update(){
+	char msg1[100];
 	switch (estado){
 		case R:
 			actualizarSW();
@@ -144,6 +149,10 @@ void MEF_update(){
 			actualizar();
 			break;
 		case IDLE:
+			strcpy(msg1, "\r\nElija el color a modificar\r\n");
+			SerialPort_Wait_For_TX_Buffer_Free(); // Espero a que el canal de transmisión este libre (bloqueante)
+			SerialPort_Send_String(msg1);
+			
 			if(leerConsola()){
 				salir = 0;
 			}
