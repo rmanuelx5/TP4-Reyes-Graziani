@@ -19,4 +19,6 @@ void inits(void);
 
 void PWM_soft_Update(void);
 
+typedef enum{R, G, B, IDLE} COLOR;
+
 #endif /* MEF_H_ */

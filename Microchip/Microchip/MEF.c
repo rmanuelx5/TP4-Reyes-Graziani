@@ -6,47 +6,13 @@
 */
 #include "MEF.h"
 #include "serialPort.h"
+#include "PWM.h"
 
 #include <string.h>
 #include <stdio.h>
-
-#define PWM_PERIOD 256 // Periodo PWM de 8 bits
-#define PWM_START DDRB |= (1 << PORTB5) // Configurar PB5 como salida
-#define PWM_OFF PORTB &= ~(1 << PORTB5)
-#define PWM_ON PORTB |= (1 << PORTB5)
-
-static uint8_t pwm_r = 128; // Duty cycle inicial para rojo (PB5)
-
-static uint8_t PWM_position=0;
-
-
-typedef enum{R, G, B, IDLE} COLOR;
 	
 static COLOR estado = IDLE;
 
-static uint8_t salir, valAnt=0, valAct=0;
-
-
-void PWM_soft_Update(){
-	if (++PWM_position>=PWM_PERIOD)
-		PWM_position=0;
-
-	if (PWM_position<=pwm_r)
-		PWM_ON;
-	else
-		PWM_OFF;
-}
-			
-void init_puertos(){	
-	DDRB |= (1<<PORTB1 | 1<<PORTB2 | 1<<PORTB5);
-	OCR1B = 128;
-	OCR1A = 128;
-}
-void initADC(){
-	DDRC &= ~(1<<PORTC3);
-	ADCSRA = 0x87;//make ADC enable and select ck/128
-	ADMUX = (0 << REFS1) | (1 << REFS0) | (1 << ADLAR) | 0x03;//Ref external VCC, ADC3, right-justified
-}
 void Init_consola(){
 	SerialPort_Init(BR9600); 		// Inicializo formato 8N1 y BAUDRATE = 9600bps
 	SerialPort_TX_Enable();			// Activo el Transmisor del Puerto Serie
@@ -54,51 +20,8 @@ void Init_consola(){
 }
 
 void inits(){
-	init_puertos();
-	initADC();
 	Init_consola();
-}
-
-uint8_t leerPot(){
-	//uint8_t val;
-	ADCSRA |= (1<<ADSC);// Iniciar conversión
-	while((ADCSRA&(1<<ADIF))==0); // Esperar a que termine la conversión
-	ADCSRA |= (1<<ADIF); // Limpiar la bandera ADIF
-	//val = ADCH;// // Escalar el valor ADC (valor máximo 1024/4 = 256)
-
-	return ADCH;
-}
-
-void actualizar(){
-	valAct = leerPot();
-	if (valAct != valAnt){
-		salir = 0;
-		valAnt = valAct;
-
-		if (estado == G) // Verde
-			OCR1B = valAct;
-		else if (estado == B) // Azul
-			OCR1A = valAct;
-	}
-	
-	salir++;
-	if (salir >= 30) //Sale luego de 3 seg de inactividad (main tiene delay de 100ms)
-		estado = IDLE;
-	return;
-}
-
-void actualizarSW(){
-	valAct = leerPot();
-	if (valAct != valAnt && estado == R){
-		salir = 0;
-		valAnt = valAct;
-		pwm_r = valAct;
-	}
-	
-	salir++;
-	if (salir >= 30) //Sale luego de 3 seg de inactividad (main tiene delay de 100ms)
-		estado = IDLE;
-	return;
+	initPWM();
 }
 
 uint8_t leerConsola(){
@@ -140,22 +63,21 @@ void MEF_update(){
 	char msg1[100];
 	switch (estado){
 		case R:
-			actualizarSW();
+			actualizarSW(&estado);
 			break;
 		case G:
-			actualizar();
+			actualizar(&estado);
 			break;
 		case B:
-			actualizar();
+			actualizar(&estado);
 			break;
 		case IDLE:
 			strcpy(msg1, "\r\nElija el color a modificar\r\n");
 			SerialPort_Wait_For_TX_Buffer_Free(); // Espero a que el canal de transmisión este libre (bloqueante)
 			SerialPort_Send_String(msg1);
 			
-			if(leerConsola()){
-				salir = 0;
-			}
+			leerConsola();
+			
 			break;
 	}
 }
