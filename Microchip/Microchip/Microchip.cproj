@@ -129,6 +129,12 @@
     <Compile Include="MEF.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="Potenciometro.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Potenciometro.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="PWM.c">
       <SubType>compile</SubType>
     </Compile>

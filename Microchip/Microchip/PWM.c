@@ -6,6 +6,7 @@
  */ 
 
 #include "PWM.h"
+#include "Potenciometro.h"
 
 #define PWM_PERIOD 256 // Periodo PWM de 8 bits
 #define PWM_START DDRB |= (1 << PORTB5) // Configurar PB5 como salida
@@ -24,11 +25,7 @@ void init_puertos(){
 	OCR1A = 128;
 }
 
-void initADC(){
-	DDRC &= ~(1<<PORTC3);
-	ADCSRA = 0x87;//make ADC enable and select ck/128
-	ADMUX = (0 << REFS1) | (1 << REFS0) | (1 << ADLAR) | 0x03;//Ref external VCC, ADC3, left-justified
-}
+
 
 void initPWM(){
 	init_puertos();
@@ -45,15 +42,7 @@ void PWM_soft_Update(){
 	PWM_OFF;
 }
 
-uint8_t leerPot(){
-	//uint8_t val;
-	ADCSRA |= (1<<ADSC);// Iniciar conversión
-	while((ADCSRA&(1<<ADIF))==0); // Esperar a que termine la conversión
-	ADCSRA |= (1<<ADIF); // Limpiar la bandera ADIF
-	//val = ADCH;// // Escalar el valor ADC (valor máximo 1024/4 = 256)
 
-	return ADCH;
-}
 
 void actualizar(COLOR *estado){
 	valAct = leerPot();
