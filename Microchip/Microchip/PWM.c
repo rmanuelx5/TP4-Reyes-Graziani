@@ -27,7 +27,7 @@ void init_puertos(){
 void initADC(){
 	DDRC &= ~(1<<PORTC3);
 	ADCSRA = 0x87;//make ADC enable and select ck/128
-	ADMUX = (0 << REFS1) | (1 << REFS0) | (1 << ADLAR) | 0x03;//Ref external VCC, ADC3, right-justified
+	ADMUX = (0 << REFS1) | (1 << REFS0) | (1 << ADLAR) | 0x03;//Ref external VCC, ADC3, left-justified
 }
 
 void initPWM(){
